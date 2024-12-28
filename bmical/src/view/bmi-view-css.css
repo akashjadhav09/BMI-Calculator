@@ -1,0 +1,58 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.user-input{
+  outline: none;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 5px;
+  width: 200px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.gender-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1%;
+}
+
+input[type="radio"] {
+  accent-color: #9b64ce; 
+  cursor: pointer;
+  height: 20px;
+  width: 20px;
+}
+
+.btn {
+  outline: none;
+  border: none;
+  border-radius: 4px;
+  /* background: rgb(106, 191, 75); */
+  background: #9b64ce;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px;
+  margin-top: 10px;
+  font-weight: 700;
+}
+
+.control-btn-wrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1%;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
