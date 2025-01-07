@@ -9,7 +9,7 @@ export default function BMICalculator() {
   const [weight, setWeigth] = useState('');
   const [gender, setGender] = useState('');
   const [isShowBMIResult, setisShowBMIResult] = useState(false);
-  let finalResult = null;
+  const [finalResult, setfinalResult] = useState(null);
 
   const validateUserDecimalInput = (event) => {
     event.target.value = event.target.value.replace(/[^0-9]/g, "");
@@ -43,14 +43,14 @@ export default function BMICalculator() {
     if (weight <= 0 || height <= 0) {
       return "Invalid input. Please enter valid weight and height values.";
     }
-    const bmi = weight / (height * height); 
-    console.log("bmi", bmi)
-    finalResult =  bmi.toFixed(2);
-    console.log(finalResult)
-    if(finalResult){
+
+    const value =( weight / ((height * height)/10000)).toFixed(2);
+    setfinalResult(value);
+    if (value) {
       setisShowBMIResult(true);
     }
   };
+ 
   
   const resetAll = ()=>{
     setName("");
@@ -134,10 +134,10 @@ export default function BMICalculator() {
           <button id="calculate" className="btn" onClick={calculateBodyMassIndex}>Check</button>
           <button id="reset" className="btn" onClick={resetAll}>Reset</button>
         </div>
+       
         {isShowBMIResult &&
-          <h3>Hi {name}, Your BMI is {finalResult}</h3>
+          <h3>Hi {name}, Your BMI is  {finalResult}</h3>
         }
-        
         </div>
       </div>
     </div>
