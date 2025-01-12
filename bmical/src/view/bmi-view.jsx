@@ -1,147 +1,119 @@
-import {React, useState} from "react";
-
-import './bmi-view-css.css'
+import React, { useState } from "react";
+import "./bmi-view-css.css";
+import ShowResult from "../result-view/result-popup";
 
 export default function BMICalculator() {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeigth] = useState('');
-  const [gender, setGender] = useState('');
-  const [isShowBMIResult, setisShowBMIResult] = useState(false);
-  const [finalResult, setfinalResult] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    height: '',
+    weight: '',
+    gender: ''
+  });
 
-  const validateUserDecimalInput = (event) => {
-    event.target.value = event.target.value.replace(/[^0-9]/g, "");
-  };
+  const [isShowBMIResult, setIsShowBMIResult] = useState(false);
+  const [finalResult, setFinalResult] = useState(null);
 
-  const validateUserTextInput = (event) => {
-    event.target.value = event.target.value.replace(/[^a-zA-Z\s]/g, "");
-  };
-  
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    const validatedValue = name === 'name'
+      ? value.replace(/[^a-zA-Z\s]/g, "")   // Allow only text for name
+      : value.replace(/[^0-9]/g, "");       // Allow only numbers for others
 
-  const handleAgeChange = (event) => {
-    setAge(event.target.value);
+    setFormData({ ...formData, [name]: validatedValue });
   };
 
-  const handleHeightChange = (event) => {
-    setHeight(event.target.value);
+
+  const handleGenderChange = (value) => {
+    setFormData({ ...formData, gender: value });
   };
 
-  const handleWeightChange = (event) => {
-    setWeigth(event.target.value);
-  };
-
-  const handleRadioButtonChange = (value) => {
-    setGender(value);
-  };
 
   const calculateBodyMassIndex = () => {
-    if (weight <= 0 || height <= 0) {
-      return "Invalid input. Please enter valid weight and height values.";
+    const { weight, height } = formData;
+    const numericWeight = parseFloat(weight);
+    const numericHeight = parseFloat(height);
+
+    if (numericWeight <= 0 || numericHeight <= 0) {
+      alert("Invalid input. Please enter valid weight and height values.");
+      return;
     }
 
-    const value =( weight / ((height * height)/10000)).toFixed(2);
-    setfinalResult(value);
-    if (value) {
-      setisShowBMIResult(true);
-    }
+    const bmi = (numericWeight / ((numericHeight * numericHeight) / 10000)).toFixed(2);
+    setFinalResult(bmi);
+    setIsShowBMIResult(true);
+    console.log("isShowBMIResult ", isShowBMIResult)
   };
- 
-  
-  const resetAll = ()=>{
-    setName("");
-    setAge("");
-    setHeight("");
-    setWeigth("");
-  }
+
+
+  const resetAll = () => {
+    setFormData({
+      name: '',
+      age: '',
+      height: '',
+      weight: '',
+      gender: ''
+    });
+    setIsShowBMIResult(false);
+    setFinalResult(null);
+  };
 
   return (
-  <>
-    <h3>BMI Calculator</h3>
-    <div className="main-wrapper__outer bmi-widget">
-      <div className="main-wrapper__inner">
-        <div className="main-view-conatiner">
+    <>
+      <h3>BMI Calculator</h3>
+      <div className="main-wrapper__outer bmi-widget">
+        <div className="main-wrapper__inner">
+          <div className="main-view-container">
 
-        <h4>Enter Your Name</h4>
-        <input  type="text"
-                min={0} 
-                max={150} 
-                className="user-input"
-                value={name}
-                onChange={handleNameChange}
-                onInput={validateUserTextInput} />
+            {['Name', 'Age', 'Height (Cm)', 'Weight (Kg)'].map((label, index) => {
+              const key = label.toLowerCase().split(' ')[0];
+              return (
+                <div key={index}>
+                  <h4>Enter Your {label}</h4>
+                  <input
+                    type="text"
+                    min={0}
+                    name={key}
+                    value={formData[key]}
+                    className="user-input"
+                    onChange={handleInputChange}
+                  />
+                </div>
+              );
+            })}
 
-        <h4>Enter Your Age</h4>
-        <input  type="text"
-                min={0} 
-                max={150} 
-                className="user-input"
-                value={age}
-                onChange={handleAgeChange}
-                onInput={validateUserDecimalInput} />
-      
-        <h4>Enter Your Height (Cm)</h4>
-        <input  type="text" 
-                min={0} 
-                value={height}
-                className="user-input"
-                onChange={handleHeightChange}
-                onInput={validateUserDecimalInput} />
+            <h4>Select Gender</h4>
+            <div className="gender-btn-wrapper">
+              {['male', 'female', 'other'].map((gender, index) => (
+                <div key={index}>
+                  <input
+                    type="radio"
+                    id={gender}
+                    name="gender"
+                    value={gender}
+                    checked={formData.gender === gender}
+                    onChange={() => handleGenderChange(gender)}
+                  />
+                  <label htmlFor={gender}>{gender.charAt(0).toUpperCase() + gender.slice(1)}</label>
+                </div>
+              ))}
+            </div>
 
-        <h4>Enter Your Weight (Kg)</h4>
-        <input  type="text" 
-                min={0} 
-                value={weight}
-                className="user-input" 
-                onChange={handleWeightChange}
-                onInput={validateUserDecimalInput} />
+            <div className="control-btn-wrapper">
+              <button id="calculate" className="btn" onClick={calculateBodyMassIndex}>Check</button>
+              <button id="reset" className="btn" onClick={resetAll}>Reset</button>
+            </div>
 
-        <h4>Select Gender</h4>
-        <div className="gender-btn-wrapper">
-            <input 
-              type="radio" 
-              id="Male" 
-              name="gender"               
-              value="male" 
-              onChange={()=>handleRadioButtonChange('male')}
-            />
-            <label htmlFor="Male">Male</label>
-
-            <input 
-              type="radio" 
-              id="Female" 
-              name="gender" 
-              value="female" 
-              onChange={()=>handleRadioButtonChange('female')}
-            />
-            <label htmlFor="Female">Female</label>
-     
-            <input 
-              type="radio" 
-              id="Other" 
-              name="gender" 
-              value="other" 
-              onChange={()=>handleRadioButtonChange('other')}                
-            />
-            <label htmlFor="Other">Other</label>
-       
-        </div>
-        <div className="control-btn-wrapper">
-          <button id="calculate" className="btn" onClick={calculateBodyMassIndex}>Check</button>
-          <button id="reset" className="btn" onClick={resetAll}>Reset</button>
-        </div>
-       
-        {isShowBMIResult &&
-          <h3>Hi {name}, Your BMI is  {finalResult}</h3>
-        }
+            {isShowBMIResult && (
+              <ShowResult 
+              name={formData.name} 
+              finalResult={finalResult} 
+              isModalOpen={isShowBMIResult} 
+              onClose={() => setIsShowBMIResult(false)}/>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  </>
-  )
+    </>
+  );
 }
-
