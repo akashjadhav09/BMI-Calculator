@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import "./bmi-view-css.css";
 import ShowResult from "../result-view/result-popup";
 
@@ -10,27 +11,34 @@ export default function BMICalculator() {
     weight: '',
     gender: ''
   });
-
-  const [isShowBMIResult, setIsShowBMIResult] = useState(false);
   const [finalResult, setFinalResult] = useState(null);
+  const [UserBMI, setUserBMI] = useState('');
+  const [isShowBMIResult, setIsShowBMIResult] = useState(false);
+  const [isShowValidationPopup, setIsShowValidationPopup] = useState(false);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const validatedValue = name === 'name'
-      ? value.replace(/[^a-zA-Z\s]/g, "")   // Allow only text for name
-      : value.replace(/[^0-9]/g, "");       // Allow only numbers for others
+      ? value.replace(/[^a-zA-Z\s]/g, "")
+      : value.replace(/[^0-9]/g, "");
 
     setFormData({ ...formData, [name]: validatedValue });
   };
-
 
   const handleGenderChange = (value) => {
     setFormData({ ...formData, gender: value });
   };
 
-
   const calculateBodyMassIndex = () => {
-    const { weight, height } = formData;
+    const { name, age, height, weight, gender } = formData;
+
+    if (!name || !age || !height || !weight || !gender) {
+      setIsShowValidationPopup(true);
+      setIsShowBMIResult(false);
+      return;
+    }
+
     const numericWeight = parseFloat(weight);
     const numericHeight = parseFloat(height);
 
@@ -41,10 +49,10 @@ export default function BMICalculator() {
 
     const bmi = (numericWeight / ((numericHeight * numericHeight) / 10000)).toFixed(2);
     setFinalResult(bmi);
+    calculateHealthCategory(bmi);
     setIsShowBMIResult(true);
-    console.log("isShowBMIResult ", isShowBMIResult)
+    setIsShowValidationPopup(false);
   };
-
 
   const resetAll = () => {
     setFormData({
@@ -55,8 +63,20 @@ export default function BMICalculator() {
       gender: ''
     });
     setIsShowBMIResult(false);
+    setIsShowValidationPopup(false);
     setFinalResult(null);
   };
+
+  const calculateHealthCategory = (UserBMI) => {
+    if (UserBMI < 18) {
+      setUserBMI('Underweight');
+    } else if (UserBMI > 25) {
+      setUserBMI('Overweight');
+    } else {
+      setUserBMI('Normal');
+    }
+  };
+
 
   return (
     <>
@@ -85,7 +105,7 @@ export default function BMICalculator() {
             <h4>Select Gender</h4>
             <div className="gender-btn-wrapper">
               {['male', 'female', 'other'].map((gender, index) => (
-                <div key={index}>
+                <div key={index} className="gender-inner">
                   <input
                     type="radio"
                     id={gender}
@@ -105,11 +125,22 @@ export default function BMICalculator() {
             </div>
 
             {isShowBMIResult && (
-              <ShowResult 
-              name={formData.name} 
-              finalResult={finalResult} 
-              isModalOpen={isShowBMIResult} 
-              onClose={() => setIsShowBMIResult(false)}/>
+              <ShowResult
+                name={formData.name}
+                finalResult={finalResult}
+                isModalOpen={isShowBMIResult}
+                UserBMI={UserBMI}
+                onClose={() => setIsShowBMIResult(false)}
+              />
+            )}
+
+            {isShowValidationPopup && (
+              <ShowResult
+                showValidationMessage={'Please fill out all fields correctly.'}
+                isModalOpen={isShowValidationPopup}
+                ShowValidationPopup={isShowBMIResult ? !isShowBMIResult : isShowValidationPopup}
+                onClose={() => setIsShowValidationPopup(false)}
+              />
             )}
           </div>
         </div>
