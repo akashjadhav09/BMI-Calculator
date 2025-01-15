@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import "./bmi-view-css.css";
 import ShowResult from "../result-view/result-popup";
+import { useTranslation } from "react-i18next"; 
 
 export default function BMICalculator() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ export default function BMICalculator() {
   const [UserBMI, setUserBMI] = useState('');
   const [isShowBMIResult, setIsShowBMIResult] = useState(false);
   const [isShowValidationPopup, setIsShowValidationPopup] = useState(false);
+  const { t } = useTranslation();
 
 
   const handleInputChange = (e) => {
@@ -80,7 +82,8 @@ export default function BMICalculator() {
 
   return (
     <>
-      <h3>BMI Calculator</h3>
+      <h2>{t('welcome')}</h2>
+      {/* <h3>BMI Calculator</h3> */}
       <div className="main-wrapper__outer bmi-widget">
         <div className="main-wrapper__inner">
           <div className="main-view-container">
@@ -89,7 +92,7 @@ export default function BMICalculator() {
               const key = label.toLowerCase().split(' ')[0];
               return (
                 <div key={index}>
-                  <h4>Enter Your {label}</h4>
+                  <h4>{t('enterYour', { label: t(key) })}</h4>
                   <input
                     type="text"
                     min={0}
@@ -102,7 +105,7 @@ export default function BMICalculator() {
               );
             })}
 
-            <h4>Select Gender</h4>
+            <h4>{t('selectGender')}</h4>
             <div className="gender-btn-wrapper">
               {['male', 'female', 'other'].map((gender, index) => (
                 <div key={index} className="gender-inner">
@@ -114,14 +117,14 @@ export default function BMICalculator() {
                     checked={formData.gender === gender}
                     onChange={() => handleGenderChange(gender)}
                   />
-                  <label htmlFor={gender}>{gender.charAt(0).toUpperCase() + gender.slice(1)}</label>
+                  <label htmlFor={gender}>{t(gender)}</label>
                 </div>
               ))}
             </div>
 
             <div className="control-btn-wrapper">
-              <button id="calculate" className="btn" onClick={calculateBodyMassIndex}>Check</button>
-              <button id="reset" className="btn" onClick={resetAll}>Reset</button>
+              <button id="calculate" className="btn" onClick={calculateBodyMassIndex}>{t('calculate')}</button>
+              <button id="reset" className="btn" onClick={resetAll}>{t('reset')}</button>
             </div>
 
             {isShowBMIResult && (
